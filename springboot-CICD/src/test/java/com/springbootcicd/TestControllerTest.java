@@ -11,6 +11,6 @@ class TestControllerTest {
 
     @Test
     public void test() {
-        Assertions.assertThat(true).isTrue();
+        Assertions.assertThat(false).isTrue();
     }
 }
