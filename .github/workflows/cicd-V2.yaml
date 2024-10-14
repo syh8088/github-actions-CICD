@@ -1,5 +1,15 @@
 name: cicd-V2
-on: push
+on:
+  push:
+    paths:
+    - 'springboot-CICD/**'
+    tags:
+    - 'v[0-9]+.[0-9]+.[0-9]+'
+  pull_request:
+    types: [opened, synchronize, closed]
+    branches: [dev, master]
+    paths:
+    - 'springboot-CICD/**'
 
 jobs:
   test:
