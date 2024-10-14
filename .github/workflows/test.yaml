@@ -9,4 +9,4 @@ jobs:
       uses: actions/checkout@v4
     - name: echo test
       run:
-        echo hello world
+        echo hello world 
