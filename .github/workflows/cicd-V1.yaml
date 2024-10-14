@@ -2,7 +2,7 @@ name: cicd-V1
 on: push
 
 jobs:
-  push-job:
+  push-test:
     runs-on: ubuntu-latest
     steps:
     - name: checkout
@@ -13,6 +13,10 @@ jobs:
         java-version: 17
         distribution: 'temurin'
     - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
+      run: |
+        cd springboot-CICD
+        chmod +x gradlew
     - name: Build with Gradle
-      run: ./gradlew build
+      run: |
+        cd springboot-CICD
+        ./gradlew build
