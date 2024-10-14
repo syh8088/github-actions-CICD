@@ -2,11 +2,11 @@ name: test
 on: push
 
 jobs:
-  debug:
+  push-job:
     runs-on: ubuntu-latest
     steps:
     - name: checkout
       uses: actions/checkout@v4
     - name: echo test
       run:
-        echo hello world 
+        echo hello world
