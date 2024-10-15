@@ -163,7 +163,7 @@ jobs:
 #        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 #        SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
-  get_branch:
+  get-branch:
     if: github.ref_type == 'tag'
     runs-on: ubuntu-latest
     outputs:
@@ -195,7 +195,7 @@ jobs:
 #        git push origin release/${{ github.ref_name }}
     - name: create pr
       run: |
-        gh pr create --base develop --head ${{ needs.get_branch.outputs.branch }} --title "${{ needs.get_branch.outputs.branch }} -> develop" --body "release pr"
+        gh pr create --base develop --head ${{ needs.get-branch.outputs.branch }} --title "${{ needs.get-branch.outputs.branch }} -> develop" --body "release pr"
 
   create-pr-prod:
     if: needs.set-environment.outputs.environment == 'release-prod'
