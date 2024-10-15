@@ -66,8 +66,10 @@ jobs:
         
         if [[ ${{ github.ref_type }} == "branch" ]]; then
           echo "environment=dev" >> $GITHUB_OUTPUT
-          if [[ ${{ github.base_ref }} == "develop" ]]; then
-            echo "environment=prod" >> $GITHUB_OUTPUT
+          if [[ ${{ github.base_ref }} == "release-prod" ]]; then
+            echo "environment=prod" >> $GITHUB_OUTPUT 
+          elif [[ ${{ github.base_ref }} == "develop" ]]; then
+            echo "environment=develop" >> $GITHUB_OUTPUT
           fi
         fi
     - name: check env
@@ -168,7 +170,9 @@ jobs:
       branch: ${{ steps.get-branch.outputs.branch }}
     steps:
     - name: checkout source code
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - name: get branch
       id: get-branch
       run: |
