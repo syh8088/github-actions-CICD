@@ -168,7 +168,9 @@ jobs:
       branch: ${{ steps.get-branch.outputs.branch }}
     steps:
     - name: checkout source code
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - name: get branch
       id: get-branch
       run: |
