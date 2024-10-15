@@ -20,7 +20,7 @@ jobs:
       branch: ${{ steps.set-env.outputs.branch }}
     steps:
     - name: checkout source code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v1
     - name: get branch
       id: set-branch
       run: |
