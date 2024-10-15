@@ -162,9 +162,11 @@ jobs:
 #      run: |
 #        git checkout -b release/${{ github.ref_name }}
 #        git push origin release/${{ github.ref_name }}
+    - name: github context
+      run: echo '${{ toJSON(github) }}'
     - name: create pr
       run: |
-        gh pr create --base develop --head release/${{ github.ref_name }} --title "release/${{ github.ref_name }} -> develop" --body "release pr"
+        gh pr create --base develop --head release/${{ github.base_ref }} --title "release/${{ github.base_ref }} -> develop" --body "release pr"
 
   create-pr-prod:
     if: github.base_ref == 'develop'
@@ -177,5 +179,5 @@ jobs:
         echo ${{ secrets.PERSONAL_ACCESS_TOKEN }} | gh auth login --with-token
     - name: create pr
       run: |
-        gh pr create --base release-prod --head release/${{ github.base_ref }} --title "release/${{ github.base_ref }} -> release-prod" --body "release pr"
+        gh pr create --base release-prod --head ${{ github.base_ref }} --title "${{ github.base_ref }} -> release-prod" --body "release pr"
 
