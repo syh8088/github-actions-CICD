@@ -39,7 +39,7 @@ jobs:
         ./gradlew build
 
   set-environment:
-    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true && github.base_ref != 'develop'
     runs-on: ubuntu-latest
     outputs:
       environment: ${{ steps.set-env.outputs.environment }}
@@ -147,7 +147,7 @@ jobs:
 #        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 #        SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
-  create-pr:
+  create-pr-develop:
     #if: needs.set-environment.outputs.environment == 'qa'
     if: github.ref_type == 'tag'
     runs-on: ubuntu-latest
@@ -158,10 +158,24 @@ jobs:
     - name: gh auth login
       run: |
         echo ${{ secrets.PERSONAL_ACCESS_TOKEN }} | gh auth login --with-token
-    - name: create branch
-      run: |
-        git checkout -b release/${{ github.ref_name }}
-        git push origin release/${{ github.ref_name }}
+#    - name: create branch
+#      run: |
+#        git checkout -b release/${{ github.ref_name }}
+#        git push origin release/${{ github.ref_name }}
     - name: create pr
       run: |
-        gh pr create --base develop --head release/${{ github.ref_name }} --title "release/${{ github.ref_name }} -> develop" --body "release pr"
+        gh pr create --base develop --head release/${{ github.base_ref }} --title "release/${{ github.base_ref }} -> develop" --body "release pr"
+
+  create-pr-prod:
+    if: github.base_ref == 'develop'
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4
+    - name: gh auth login
+      run: |
+        echo ${{ secrets.PERSONAL_ACCESS_TOKEN }} | gh auth login --with-token
+    - name: create pr
+      run: |
+        gh pr create --base release-prod --head release/${{ github.base_ref }} --title "release/${{ github.base_ref }} -> release-prod" --body "release pr"
+
