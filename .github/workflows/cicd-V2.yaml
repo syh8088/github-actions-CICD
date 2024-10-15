@@ -15,6 +15,7 @@ on:
 jobs:
 
   get_branch:
+    if: github.ref_type == 'tag'
     runs-on: ubuntu-latest
     outputs:
       branch: ${{ steps.set-env.outputs.branch }}
