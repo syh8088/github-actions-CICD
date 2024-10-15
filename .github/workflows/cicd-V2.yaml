@@ -7,19 +7,21 @@ on:
     - 'v[0-9]+.[0-9]+.[0-9]+'
   pull_request:
     types: [opened, synchronize, closed]
-    branches: ["release-dev", "develop"]
+    branches: ["release-dev", "develop", "release-prod"]
 
     paths:
     - 'springboot-CICD/**'
 
 jobs:
 
-
   github_context:
     runs-on: ubuntu-latest
     steps:
+    - name: checkout the code
+      uses: actions/checkout@v4
     - name: github_context
       run: echo '${{ toJSON(github) }}'
+
 
   test:
     if: (github.event.action == 'opened' || github.event.action == 'synchronize') && github.base_ref != 'develop'
@@ -48,7 +50,7 @@ jobs:
         ./gradlew build
 
   set-environment:
-    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true || github.ref_type == 'tag'
     runs-on: ubuntu-latest
     outputs:
       environment: ${{ steps.set-env.outputs.environment }}
@@ -56,6 +58,12 @@ jobs:
     - name: set env
       id: set-env
       run: |
+        
+        if [[ ${{ github.ref_type }} == "tag" ]]; then
+          echo "environment=develop" >> $GITHUB_OUTPUT 
+          exit 0
+        fi
+        
         if [[ ${{ github.ref_type }} == "branch" ]]; then
           echo "environment=dev" >> $GITHUB_OUTPUT
           if [[ ${{ github.base_ref }} == "release-prod" ]]; then
@@ -98,6 +106,7 @@ jobs:
 #        docker push ${{ secrets.REGISTRY }}/${{ vars.REPOSITORY }}:${{ github.sha }}
 
   deploy:
+    if: needs.set-environment.outputs.environment != 'release-prod'
     runs-on: ubuntu-latest
     needs: [ set-environment, image-build ]
     permissions:
@@ -154,10 +163,45 @@ jobs:
 #        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 #        SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
-
-  create-pr:
-    if: needs.set-environment.outputs.environment == 'develop'
+  get-branch:
+    if: github.ref_type == 'tag'
     runs-on: ubuntu-latest
+    outputs:
+      branch: ${{ steps.get-branch.outputs.branch }}
+    steps:
+    - name: checkout source code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: get branch
+      id: get-branch
+      run: |
+        gitbranch=$(git branch -r --contains ${{ github.ref }} --format "%(refname:lstrip=3)")
+        echo "branch=$gitbranch" >> $GITHUB_OUTPUT
+    - name: check branch
+      run: echo ${{ steps.get-branch.outputs.branch }}
+
+  create-pr-develop:
+    if: needs.set-environment.outputs.environment == 'develop' && github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    needs: [get-branch, set-environment]
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4
+    - name: gh auth login
+      run: |
+        echo ${{ secrets.PERSONAL_ACCESS_TOKEN }} | gh auth login --with-token
+#    - name: create branch
+#      run: |
+#        git checkout -b release/${{ github.ref_name }}
+#        git push origin release/${{ github.ref_name }}
+    - name: create pr
+      run: |
+        gh pr create --base develop --head ${{ needs.get-branch.outputs.branch }} --title "${{ needs.get-branch.outputs.branch }} -> develop" --body "release pr"
+
+  create-pr-prod:
+    if: needs.set-environment.outputs.environment == 'develop' && github.event.pull_request.merged == true
+    runs-on: ubuntu-latest 
     needs: [set-environment]
     steps:
     - name: checkout
@@ -165,18 +209,83 @@ jobs:
     - name: gh auth login
       run: |
         echo ${{ secrets.PERSONAL_ACCESS_TOKEN }} | gh auth login --with-token
-    - name: create branch
-      run: |
-        git checkout -b release/${{ github.ref_name }}
-        git push origin release/${{ github.ref_name }}
+#    - name: create branch
+#      run: |
+#        git checkout -b release/${{ github.ref_name }}
+#        git push origin release/${{ github.ref_name }}
     - name: create pr
       run: |
         gh pr create --base release-prod --head ${{ github.ref_name }} --title "${{ github.ref_name }} -> release-prod" --body "release pr"
 
+  approve:
+    if: needs.set-environment.outputs.environment == 'release-prod'
+    runs-on: ubuntu-latest
+    environment: approve-process
+    needs: [set-environment, image-build]
+    steps:
+    - name: approve
+      run: |
+        echo "Approve Done"
+
+  prod-deploy:
+    runs-on: ubuntu-latest
+    needs: [ approve ]
+    permissions:
+      id-token: write
+      contents: read
+    strategy:
+      matrix:
+        environment: ["${{ needs.set-environment.outputs.environment }}"]
+    environment: ${{ matrix.environment }}
+    steps:
+    - name: checkout the code
+      uses: actions/checkout@v4
+#    - name: Configure AWS Credentials
+#      id: credentials
+#      uses: aws-actions/configure-aws-credentials@v4
+#      with:
+#        aws-region: ${{ vars.AWS_REGION }}
+#        role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+#    - name: setup kubectl
+#      uses: azure/setup-kubectl@v3
+#      with:
+#        version: latest
+#    - name: setup helm
+#      uses: azure/setup-helm@v3
+#      with:
+#        version: v3.11.1
+#    - name: access kubernetes
+#      run: |
+#        aws eks update-kubeconfig --name ${{ vars.CLUSTER_NAME }}
+#    - name: deploy
+#      id: status
+#      run: |
+#        helm upgrade --install spring-boot-app kubernetes/spring-boot-app --create-namespace --namespace spring-boot-${{ vars.SUFFIX }} \
+#        --set image.tag=${{ github.sha }} \
+#        --set image.repository=${{ secrets.REGISTRY }}/${{ vars.REPOSITORY }}
+#    - name: notify
+#      if: always()
+#      uses: slackapi/slack-github-action@v1.24.0
+#      with:
+#        payload: |
+#          {
+#            "text": "message",
+#            "blocks": [
+#              {
+#                "type": "section",
+#                "text": {
+#                  "type": "mrkdwn",
+#                  "text": "Environment : ${{ matrix.environment }}, Deploy Result : ${{ steps.status.outcome }}, Repository : ${{ github.repository }}."
+#                }
+#              }
+#            ]
+#          }
+#      env:
+#        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+#        SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
 
 
-#
 #  create-pr:
 #    #if: needs.set-environment.outputs.environment == 'qa'
 #    if: github.ref_type == 'tag'
