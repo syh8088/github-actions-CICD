@@ -24,7 +24,7 @@ jobs:
     - name: get branch
       run: |
         branch=$(git branch -r --contains ${{ github.ref }} --format "%(refname:lstrip=3)")
-        echo "BRANCH=$branch" >> $GITHUB_ENV
+        echo "BRANCH=$branch" >> $GITHUB_OUTPUT
     - name: check branch
       run: echo ${{ steps.set-env.outputs.branch }}
 
