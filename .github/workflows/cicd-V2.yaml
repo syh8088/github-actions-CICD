@@ -24,8 +24,8 @@ jobs:
     - name: get branch
       id: set-branch
       run: |
-        gitbranch=$(git branch -r --contains ${{ github.ref }} --format "%(refname:lstrip=3)")
-        echo "BRANCH=$gitbranch" >> $GITHUB_ENV
+        branch=$(git branch -r --contains ${{ github.ref }} --format "%(refname:lstrip=3)")
+        echo "BRANCH=$branch" >> $GITHUB_ENV
 
     - name: check branch2
       run: echo ${{ env.BRANCH }}
