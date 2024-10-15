@@ -165,10 +165,10 @@ jobs:
     - name: gh auth login
       run: |
         echo ${{ secrets.PERSONAL_ACCESS_TOKEN }} | gh auth login --with-token
-        - name: create branch
-          run: |
-            git checkout -b release/${{ github.ref_name }}
-            git push origin release/${{ github.ref_name }}
+    - name: create branch
+      run: |
+        git checkout -b release/${{ github.ref_name }}
+        git push origin release/${{ github.ref_name }}
     - name: create pr
       run: |
         gh pr create --base release-prod --head ${{ github.ref_name }} --title "${{ github.ref_name }} -> release-prod" --body "release pr"
