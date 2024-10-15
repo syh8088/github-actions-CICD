@@ -18,8 +18,18 @@ jobs:
   github_context:
     runs-on: ubuntu-latest
     steps:
+    - name: checkout the code
+      uses: actions/checkout@v4
     - name: github_context
       run: echo '${{ toJSON(github) }}'
+    - name: Get branch names
+      id: branch-name
+      uses: tj-actions/branch-names@v4.9
+    - name: 버전 정보 추출(from Branch Name)
+      run: echo "currant_branch=$(echo '${{ steps.branch-name.outputs.current_branch }}')" >> $GITHUB_ENV
+    - name: echo current branch name
+      run: echo "current branch name - ${{ env.currant_branch }}"
+
 
   test:
     if: (github.event.action == 'opened' || github.event.action == 'synchronize') && github.base_ref != 'develop'
