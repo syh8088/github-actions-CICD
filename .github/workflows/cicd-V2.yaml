@@ -12,6 +12,13 @@ on:
     - 'springboot-CICD/**'
 
 jobs:
+
+  github_context:
+    runs-on: ubuntu-latest
+    steps:
+    - name: github_context
+      run: echo '${{ toJSON(github) }}'
+
   test:
     if: github.event.action == 'opened' || github.event.action == 'synchronize'
     runs-on: ubuntu-latest
@@ -147,7 +154,7 @@ jobs:
 #        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 #        SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
-  create-pr-develop:
+  create-pr:
     #if: needs.set-environment.outputs.environment == 'qa'
     if: github.ref_type == 'tag'
     runs-on: ubuntu-latest
@@ -162,14 +169,12 @@ jobs:
 #      run: |
 #        git checkout -b release/${{ github.ref_name }}
 #        git push origin release/${{ github.ref_name }}
-    - name: github context
-      run: echo '${{ toJSON(github) }}'
     - name: create pr
       run: |
-        gh pr create --base develop --head release/${{ github.ref }} --title "release/${{ github.ref }} -> develop" --body "release pr"
+        gh pr create --base develop --head ${{ github.head_ref }} --title "${{ github.head_ref }} -> develop" --body "release pr"
 
   create-pr-prod:
-    if: github.base_ref == 'develop'
+    if: github.base_ref == 'release-prod'
     runs-on: ubuntu-latest
     steps:
     - name: checkout
@@ -177,9 +182,7 @@ jobs:
     - name: gh auth login
       run: |
         echo ${{ secrets.PERSONAL_ACCESS_TOKEN }} | gh auth login --with-token
-    - name: github context
-      run: echo '${{ toJSON(github) }}'
     - name: create pr
       run: |
-        gh pr create --base release-prod --head ${{ github.base_ref }} --title "${{ github.base_ref }} -> release-prod" --body "release pr"
+        gh pr create --base release-prod --head ${{ github.head_ref }} --title "${{ github.head_ref }} -> release-prod" --body "release pr"
 
