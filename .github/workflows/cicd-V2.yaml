@@ -206,7 +206,7 @@ jobs:
     steps:
     - name: checkout
       uses: actions/checkout@v4
-    - name: gh auth login
+    - name: gh auth login 
       run: |
         echo ${{ secrets.PERSONAL_ACCESS_TOKEN }} | gh auth login --with-token
 #    - name: create branch
