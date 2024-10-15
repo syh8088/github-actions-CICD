@@ -164,4 +164,4 @@ jobs:
         git push origin release/${{ github.ref_name }}
     - name: create pr
       run: |
-        gh pr create --base dvelop --head release/${{ github.ref_name }} --title "release/${{ github.ref_name }} -> master" --body "release pr"
+        gh pr create --base dvelop --head release/${{ github.ref_name }} --title "release/${{ github.ref_name }} -> dvelop" --body "release pr"
