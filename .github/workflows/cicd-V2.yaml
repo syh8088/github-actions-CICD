@@ -56,15 +56,12 @@ jobs:
     - name: set env
       id: set-env
       run: |
-        if [[ ${{ github.ref_type }} == "tag" ]]; then
-          echo "environment=develop" >> $GITHUB_OUTPUT 
-          exit 0
-        fi
-        
         if [[ ${{ github.ref_type }} == "branch" ]]; then
           echo "environment=dev" >> $GITHUB_OUTPUT
           if [[ ${{ github.base_ref }} == "release-prod" ]]; then
             echo "environment=prod" >> $GITHUB_OUTPUT 
+          elif [[ ${{ github.base_ref }} == "develop" ]]; then
+            echo "environment=develop" >> $GITHUB_OUTPUT
           fi
         fi
     - name: check env
