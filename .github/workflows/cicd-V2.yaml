@@ -14,39 +14,27 @@ on:
 
 jobs:
 
-  job1:
-    runs-on: ubuntu-latest
-    steps:
-    - name: checkout source code
-      uses: actions/checkout@v1
-    - name: Get Branch
-      run: |
-        branch=$(git branch -r --contains ${{ github.ref }} --format "%(refname:lstrip=3)")
-        echo "BRANCH=$branch" >> $GITHUB_ENV
-    - run: echo ${{ env.BRANCH }}
-
-  github_context:
+  get_branch:
     runs-on: ubuntu-latest
     outputs:
       branch: ${{ steps.set-env.outputs.branch }}
+    steps:
+    - name: checkout source code
+      uses: actions/checkout@v4
+    - name: get branch
+      run: |
+        branch=$(git branch -r --contains ${{ github.ref }} --format "%(refname:lstrip=3)")
+        echo "BRANCH=$branch" >> $GITHUB_ENV
+    - name: check branch
+      run: echo ${{ steps.set-env.outputs.branch }}
+
+  github_context:
+    runs-on: ubuntu-latest
     steps:
     - name: checkout the code
       uses: actions/checkout@v4
     - name: github_context
       run: echo '${{ toJSON(github) }}'
-    - name: get branch
-      run: |
-        current_branch=$(git branch -r --contains ${{ github.ref }} --format "%(refname:lstrip=3)")
-        echo "branch=$current_branch"
-    - name: check branch
-      run: echo ${{ steps.set-env.outputs.branch }}
-#    - name: Get branch names
-#      id: branch-name
-#      uses: tj-actions/branch-names@v4.9
-#    - name: 버전 정보 추출(from Branch Name)
-#      run: echo "currant_branch=$(echo '${{ steps.branch-name.outputs.current_branch }}')" >> $GITHUB_ENV
-#    - name: echo current branch name
-#      run: echo "current branch name - ${{ env.currant_branch }}"
 
 
   test:
