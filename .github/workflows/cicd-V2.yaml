@@ -7,11 +7,13 @@ on:
     - 'v[0-9]+.[0-9]+.[0-9]+'
   pull_request:
     types: [opened, synchronize, closed]
-    branches: [release-dev, develop]
+    branches: ["release-dev", "develop"]
+
     paths:
     - 'springboot-CICD/**'
 
 jobs:
+
 
   github_context:
     runs-on: ubuntu-latest
