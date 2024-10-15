@@ -164,7 +164,7 @@ jobs:
 #        git push origin release/${{ github.ref_name }}
     - name: create pr
       run: |
-        gh pr create --base develop --head release/${{ github.base_ref }} --title "release/${{ github.base_ref }} -> develop" --body "release pr"
+        gh pr create --base develop --head release/${{ github.ref_name }} --title "release/${{ github.ref_name }} -> develop" --body "release pr"
 
   create-pr-prod:
     if: github.base_ref == 'develop'
