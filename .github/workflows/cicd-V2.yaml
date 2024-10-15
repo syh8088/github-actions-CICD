@@ -23,8 +23,8 @@ jobs:
       uses: actions/checkout@v4
     - name: get branch
       run: |
-        branch=$(git branch -r --contains ${{ github.ref }} --format "%(refname:lstrip=3)")
-        echo "branch=$branch" >> $GITHUB_OUTPUT
+        current_branch=$(git branch -r --contains ${{ github.ref }} --format "%(refname:lstrip=3)")
+        echo "branch=$current_branch" >> $GITHUB_OUTPUT
     - name: check branch
       run: echo ${{ steps.set-env.outputs.branch }}
 
