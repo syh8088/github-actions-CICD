@@ -167,7 +167,7 @@ jobs:
     if: github.ref_type == 'tag'
     runs-on: ubuntu-latest
     outputs:
-      branch: ${{ steps.set-env.outputs.branch }}
+      branch: ${{ steps.get-branch.outputs.branch }}
     steps:
     - name: checkout source code
       uses: actions/checkout@v1
