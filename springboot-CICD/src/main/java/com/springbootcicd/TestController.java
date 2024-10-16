@@ -9,6 +9,6 @@ public class TestController {
     @GetMapping
     public String test() {
 
-        return "test cicd-V1.0.49";
+        return "test cicd-test1111 ";
     }
 }
