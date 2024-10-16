@@ -90,21 +90,22 @@ jobs:
     steps:
     - name: checkout the code
       uses: actions/checkout@v4
-#    - name: Configure AWS Credentials
-#      id: credentials
-#      uses: aws-actions/configure-aws-credentials@v4
-#      with:
-#        aws-region: ${{ vars.AWS_REGION }}
-#        role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-#    - name: Login to Amazon ECR
-#      id: login-ecr
-#      uses: aws-actions/amazon-ecr-login@v2
-#      with:
+    - name: Configure AWS Credentials
+      id: credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-region: ${{ vars.AWS_REGION }}
+        role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+      with:
 #        mask-password: 'true'
-#    - name: docker build & push
-#      run: |
-#        docker build -f Dockerfile --tag ${{ secrets.REGISTRY }}/${{ vars.REPOSITORY }}:${{ github.sha }} .
-#        docker push ${{ secrets.REGISTRY }}/${{ vars.REPOSITORY }}:${{ github.sha }}
+        registry-type: public
+    - name: docker build & push
+      run: |
+        docker build -f Dockerfile --tag ${{ secrets.REGISTRY }}/${{ vars.REPOSITORY }}:${{ github.sha }} .
+        docker push ${{ secrets.REGISTRY }}/${{ vars.REPOSITORY }}:${{ github.sha }}
 
   deploy:
     if: needs.set-environment.outputs.environment != 'prod'
