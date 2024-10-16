@@ -200,7 +200,7 @@ jobs:
 #      run: |
 #        gh pr create --base develop --head ${{ needs.get-branch.outputs.branch }} --title "${{ needs.get-branch.outputs.branch }} -> develop" --body "release pr"
       run: |
-        gh pr create --base develop --head ${{ github.ref_name }} --title "${{ github.ref_name }} -> develop" --body "release pr"
+        gh pr create --base develop --head release/${{ github.ref_name }} --title "release/${{ github.ref_name }} -> develop" --body "release pr"
 
   create-pr-prod:
     if: needs.set-environment.outputs.environment == 'develop' && github.event.pull_request.merged == true
