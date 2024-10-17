@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # aws sts get-caller-identity
-# chmod +x ./init.sh 
+# chmod +x ./init.sh
 
 echo "install awscli version 2"
 
@@ -24,27 +24,27 @@ sudo mv -v /tmp/eksctl /usr/local/bin
 eksctl version
 
 
-# Create eks cluter 
+# Create eks cluter
 #eksctl create cluster -f create-cluster.yaml
 
-# Delete eks cluter 
+# Delete eks cluter
 #eksctl delete cluster -f create-cluster.yaml
 
 # kubectl get ns
 
 # dev
-#kubectl get pods -n spring-boot-app-dev
-#kubectl get services -n spring-boot-app-dev
+#kubectl get pods -n spring-boot-dev
+#kubectl get services -n spring-boot-dev
 
 # qa
-#kubectl get pods -n spring-boot-app-qa
-#kubectl get services -n spring-boot-app-qa
+#kubectl get pods -n spring-boot-qa
+#kubectl get services -n spring-boot-qa
 
 # staging
-#kubectl get pods -n spring-boot-app-staging
-#kubectl get services -n spring-boot-app-staging
+#kubectl get pods -n spring-boot-staging
+#kubectl get services -n spring-boot-staging
 
 # prod
-#kubectl get pods -n spring-boot-app-prod
-#kubectl get services -n spring-boot-app-prod
+#kubectl get pods -n spring-boot-prod
+#kubectl get services -n spring-boot-prod
 

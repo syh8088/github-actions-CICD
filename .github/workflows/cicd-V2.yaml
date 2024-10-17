@@ -101,9 +101,13 @@ jobs:
       uses: aws-actions/amazon-ecr-login@v2
       with:
         mask-password: 'true'
+      #    - name: docker build & push
+      #      run: |
+      #        docker build -f Dockerfile --tag ${{ secrets.REGISTRY }}/${{ vars.REPOSITORY }}:${{ github.sha }} .
+      #        docker push ${{ secrets.REGISTRY }}/${{ vars.REPOSITORY }}:${{ github.sha }}
     - name: docker build & push
       run: |
-        docker build -f Dockerfile --tag ${{ secrets.REGISTRY }}/${{ vars.REPOSITORY }}:${{ github.sha }} .
+        docker build -f ./springboot-CICD/Dockerfile --tag ${{ secrets.REGISTRY }}/${{ vars.REPOSITORY }}:${{ github.sha }} ./springboot-CICD
         docker push ${{ secrets.REGISTRY }}/${{ vars.REPOSITORY }}:${{ github.sha }}
 
   deploy:
