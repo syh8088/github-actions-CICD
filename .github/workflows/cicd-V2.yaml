@@ -208,7 +208,7 @@ jobs:
       contents: read
     strategy:
       matrix:
-        environment: ["${{ needs.set-environment.outputs.environment }}"]
+        environment: ["prod"]
     environment: ${{ matrix.environment }}
     steps:
     - name: checkout the code
