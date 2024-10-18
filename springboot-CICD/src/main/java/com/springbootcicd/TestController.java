@@ -9,6 +9,6 @@ public class TestController {
     @GetMapping
     public String test() {
 
-        return "SpringBoot App CICD-TEST1";
+        return "SpringBoot App CICD TEST 1";
     }
 }
